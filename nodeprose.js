@@ -21,6 +21,10 @@ var writers = new Array();
 var contributions = new Array();
 var currentWriter;
 
+io.configure(function () { 
+  io.set("transports", ["xhr-polling"]); 
+  io.set("polling duration", 10); 
+});
 
 io.sockets.on('connection', function (socket) {
   if(writers.length < 20) {
