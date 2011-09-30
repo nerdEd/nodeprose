@@ -18,8 +18,15 @@ function handler (req, res) {
 }
 
 var writers = new Array();
+var readers = new Array();
 var contributions = new Array();
 var currentWriter;
+
+var resetAll = function() {
+  writers = new Array();
+  readers = new Array();
+  contributions = new Array();
+}
 
 io.configure(function () { 
   io.set("transports", ["xhr-polling"]); 
@@ -29,6 +36,11 @@ io.configure(function () {
 io.sockets.on('connection', function (socket) {
   if(writers.length < 20) {
     writers.push(socket);
+  } else if(writers.length === 0) {
+    writers.push(socket);
+    socket.emit('write', {});
+  } else {
+    readers.push(socket);
   }
 
   socket.on('message', function (data) {
@@ -37,8 +49,7 @@ io.sockets.on('connection', function (socket) {
     io.sockets.emit('lockdown', {});
     if(contributions.length > 10) {
       io.sockets.emit('full_text', {full_text: contributions});
-      writers = new Array();
-      contributions = new Array();
+      resetAll();
     } else {
       var currentWriter = writers.pop();
       currentWriter.emit('write', {});
