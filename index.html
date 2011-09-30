@@ -4,7 +4,10 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script type="text/javascript">
       $(document).ready(function() {
-        var socket = io.connect('/');
+        var loc = document.location;
+        var url = loc.protocol + "//" + loc.hostname;
+
+        var socket = io.connect(url);
 
         socket.on('prose', function(data) {
           $('#dump').append("<p>" + data.prose + "</p");
