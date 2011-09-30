@@ -18,15 +18,17 @@ function handler (req, res) {
   });
 }
 
-var writers = new Array();
-var readers = new Array();
-var contributions = new Array();
-var currentWriter;
+var nodeprose = {}
 
-var resetAll = function() {
-  writers = new Array();
-  readers = new Array();
-  contributions = new Array();
+nodeprose.writers = new Array();
+nodeprose.readers = new Array();
+nodeprose.contributions = new Array();
+nodeprose.currentWriter;
+
+nodeprose.resetAll = function() {
+  nodeprose.writers = new Array();
+  nodeprose.readers = new Array();
+  nodeprose.contributions = new Array();
 }
 
 io.configure(function () { 
@@ -35,26 +37,33 @@ io.configure(function () {
 });
 
 io.sockets.on('connection', function (socket) {
-  if(writers.length < 20) {
-    writers.push(socket);
-  } else if(writers.length === 0) {
-    writers.push(socket);
+  if(nodeprose.writers.length == 0) {
+    nodeprose.writers.push(socket);
     socket.emit('write', {});
+  } else if(nodeprose.writers.length < 21) {
+    nodeprose.writers.push(socket);
   } else {
-    readers.push(socket);
+    nodeprose.readers.push(socket);
   }
 
+  socket.on('disconnect', function(socket) {
+    if(nodeprose.writers[0] === socket) {
+      selectNextWriter();
+    }
+    nodeprose.writers = _.without(nodeprose.writers, socket);
+  });
+
   socket.on('message', function (data) {
-    contributions.push(data.prose);
+    nodeprose.contributions.push(data.prose);
     io.sockets.emit('prose', data);
     io.sockets.emit('lockdown', {});
-    if(contributions.length > 10) {
-      io.sockets.emit('full_text', {full_text: contributions});
-      resetAll();
+    if(nodeprose.contributions.length > 10) {
+      io.sockets.emit('full_text', {full_text: nodeprose.contributions});
+      nodeprose.resetAll();
     } else {
-      var currentWriter = writers.pop();
+      var currentWriter = nodeprose.writers.shift();
       currentWriter.emit('write', {});
-      writers.push(currentWriter);
+      nodeprose.writers.push(currentWriter);
     }
   });
 });
