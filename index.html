@@ -5,7 +5,11 @@
     <script type="text/javascript">
       $(document).ready(function() {
         var loc = document.location;
-        var url = loc.protocol + "//" + loc.hostname;
+        var port = document.location.port;
+        var url = loc.protocol + "//" + loc.hostname ;
+        if(port.length > 0) {
+          url = url + ":" + port
+        }
 
         var socket = io.connect(url);
 
