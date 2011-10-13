@@ -1,1 +1,1 @@
-web: node nodeprose.js
+web: coffee nodeprose.coffee
