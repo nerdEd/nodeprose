@@ -5,6 +5,7 @@
     "socket.io": "0.8.4",
     "underscore": "1.1.7", 
     "express": "2.4.7",
-    "jade": "0.16.2"
+    "jade": "0.16.2",
+    "coffee-script": "1.1.2"
   }
 }
