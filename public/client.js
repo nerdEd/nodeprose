@@ -15,12 +15,13 @@ $(document).ready(function() {
   socket.on('full_text', function(data) {
     var dump = $('#dump');
     dump.empty();
-    _.each(data.contributions, function(contri) {
+    _.each(data.full_text, function(contri) {
       dump.append("<p>" + contri + "</p>");
     });
   });
 
   socket.on('write', function(data) {
+    $('#dump p:last-child').html(data.lastMessage);
     $('#proseUpdater').show();
   });
 

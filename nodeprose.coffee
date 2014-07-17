@@ -37,7 +37,7 @@ np.removeWriter = (writer) ->
 np.selectNextWriter = ->
   return if np.writers.length == 0
   currentWriter = np.writers.pop()
-  currentWriter.emit 'write', {}
+  currentWriter.emit 'write', {lastMessage: np.contributions[np.contributions.length-1]}
   np.writers.unshift currentWriter
 
 np.resetAll()
@@ -54,7 +54,7 @@ io.sockets.on 'connection', (socket) ->
     _.map waitingWriters, (writer) ->
       writer.emit 'prose', {}
 
-    if np.contributions.length > 9
+    if np.contributions.length > 2
       io.sockets.emit 'full_text', full_text: np.contributions
       np.resetAll()
     else
